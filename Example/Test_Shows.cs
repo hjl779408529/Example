@@ -30,7 +30,8 @@ namespace Example
         //定义方法
         Method01 method01 = new Method01();
         Method02 method02 = new Method02();
-
+        Method03 method03 = new Method03();
+        Method04 method04 = new Method04();
         /// <summary>
         /// 移除事件绑定
         /// </summary>
@@ -95,6 +96,7 @@ namespace Example
             else
             {
                 Start.Enabled = false;
+                SelectMethod.Enabled = false;
                 StartEvent?.Invoke();
                 running = true;
             }
@@ -115,6 +117,7 @@ namespace Example
                 pause.Enabled = true;
                 resume.Enabled = true;
                 stop.Enabled = true;
+                SelectMethod.Enabled = true;
             }
             else
             {
@@ -195,7 +198,6 @@ namespace Example
                     RemoveEvent<Method01>(method01, "Info");
                     //绑定事件
                     method01.Info += Info;
-                    //method01.End += exit;
                     //移除事件
                     RemoveEvent<Test_Shows>(this, "StartEvent");
                     RemoveEvent<Test_Shows>(this, "PauseEvent");
@@ -212,7 +214,6 @@ namespace Example
                     RemoveEvent<Method02>(method02, "Info");
                     //绑定事件
                     method02.Info += Info;
-                    //method02.End += exit;
                     //移除事件
                     RemoveEvent<Test_Shows>(this, "StartEvent");
                     RemoveEvent<Test_Shows>(this, "PauseEvent");
@@ -226,8 +227,38 @@ namespace Example
                     StopEvent += method02.ThreadStop;
                     break;
                 case 3:
+                    //移除事件
+                    RemoveEvent<Method03>(method03, "Info");
+                    //绑定事件
+                    method03.Info += Info;
+                    //移除事件
+                    RemoveEvent<Test_Shows>(this, "StartEvent");
+                    RemoveEvent<Test_Shows>(this, "PauseEvent");
+                    RemoveEvent<Test_Shows>(this, "ResumeEvent");
+                    RemoveEvent<Test_Shows>(this, "StopEvent");
+                    //绑定事件
+                    RemoveEvent<Test_Shows>(this, "Work");
+                    StartEvent += method03.ThreadStart;
+                    PauseEvent += method03.ThreadPause;
+                    ResumeEvent += method03.ThreadResume;
+                    StopEvent += method03.ThreadStop;
                     break;
                 case 4:
+                    //移除事件
+                    RemoveEvent<Method04>(method04, "Info");
+                    //绑定事件
+                    method04.Info += Info;
+                    //移除事件
+                    RemoveEvent<Test_Shows>(this, "StartEvent");
+                    RemoveEvent<Test_Shows>(this, "PauseEvent");
+                    RemoveEvent<Test_Shows>(this, "ResumeEvent");
+                    RemoveEvent<Test_Shows>(this, "StopEvent");
+                    //绑定事件
+                    RemoveEvent<Test_Shows>(this, "Work");
+                    StartEvent += method04.ThreadStart;
+                    PauseEvent += method04.ThreadPause;
+                    ResumeEvent += method04.ThreadResume;
+                    StopEvent += method04.ThreadStop;
                     break;
                 case 5:
                     break;

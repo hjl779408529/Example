@@ -8,11 +8,14 @@ using System.Threading.Tasks;
 namespace Example.Methods
 {
     public delegate void Trans(string info);
-    public delegate void End();
+    public delegate void Work();
+    /// <summary>
+    /// IEnumerator实现
+    /// </summary>
     class Method01
     {
         public event Trans Info;
-        public event End End;
+        public event Work End;
         public bool on_off = false;//运行、暂停切换
         public bool stop = false;//停止
         Thread thread;
@@ -97,10 +100,18 @@ namespace Example.Methods
         }        
 
     }
+    /// <summary>
+    /// ManualResetEvent 实现
+    /// </summary>
     class Method02
     {
         public event Trans Info;
-        public event End End; 
+        public event Work StartCode; //启动执行代码
+        public event Work WorkCode; //启动执行代码
+        public event Work PauseCode; //暂停执行代码
+        public event Work ResumeCode; //恢复执行代码
+        public event Work StopCode; //停止执行代码
+        public event Work EndCode; //结束执行代码
         Thread thread;
         ManualResetEvent ma;
         public bool on_off = false;//运行、暂停切换
@@ -113,6 +124,7 @@ namespace Example.Methods
             thread = new Thread(Runtime);
             thread.Start();
             Info?.Invoke("启动运行！！！");
+            StartCode?.Invoke();
         }
         /// <summary>
         /// 暂停运行
@@ -121,6 +133,7 @@ namespace Example.Methods
         {
             on_off = true;
             Info?.Invoke("暂停运行！！！");
+            PauseCode?.Invoke();
         }
         /// <summary>
         /// 恢复运行
@@ -130,6 +143,7 @@ namespace Example.Methods
             on_off = false;
             ma.Set();
             Info?.Invoke("继续运行！！！");
+            ResumeCode?.Invoke();
         }
         /// <summary>
         /// 终止运行
@@ -155,6 +169,7 @@ namespace Example.Methods
             {
                 if (stop)//退出
                 {
+                    StopCode?.Invoke();
                     return;
                 }
                 if (on_off)//运行和暂停切换
@@ -163,9 +178,151 @@ namespace Example.Methods
                     ma.WaitOne();
                 }
                 Info?.Invoke("计数：" + i.ToString());
+                WorkCode?.Invoke();
                 Thread.Sleep(500);
             }
-            End?.Invoke();
+            EndCode?.Invoke();
+        }
+    }
+    /// <summary>
+    /// System.Timers.Timer实现
+    /// </summary>
+    class Method03
+    {
+        public event Trans Info;
+        public event Work StartCode; //启动执行代码
+        public event Work WorkCode; //启动执行代码
+        public event Work PauseCode; //暂停执行代码
+        public event Work ResumeCode; //恢复执行代码
+        public event Work StopCode; //停止执行代码
+        public event Work EndCode; //结束执行代码
+        System.Timers.Timer timer;
+        int count;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public Method03()
+        {
+            
+        }
+        /// <summary>
+        /// 启动运行
+        /// </summary>
+        public void ThreadStart()
+        {
+            timer = new System.Timers.Timer(500);
+            timer.Elapsed += Runtime;
+            timer.AutoReset = true;
+            timer.Enabled = true;
+            count = 0;
+            timer.Start();
+            Info?.Invoke("启动运行！！！");
+            StartCode?.Invoke();
+        }
+        /// <summary>
+        /// 暂停运行
+        /// </summary>
+        public void ThreadPause()
+        {
+            timer.Enabled = false;
+            Info?.Invoke("暂停运行！！！");
+            PauseCode?.Invoke();
+        }
+        /// <summary>
+        /// 恢复运行
+        /// </summary>
+        public void ThreadResume()
+        {
+            timer.Enabled =true;
+            Info?.Invoke("继续运行！！！");
+            ResumeCode?.Invoke();
+        }
+        /// <summary>
+        /// 终止运行
+        /// </summary>
+        public void ThreadStop()
+        {
+            timer.Dispose();
+            Info?.Invoke("终止运行！！！");
+        }
+        /// <summary>
+        /// 循环结构
+        /// </summary>
+        public void Runtime(object sender, EventArgs e)
+        {
+            count++;
+            Info?.Invoke("计数：" + count.ToString());
+            WorkCode?.Invoke();            
+            if (count == 1000) EndCode?.Invoke();
+        }
+    }
+    /// <summary>
+    /// System.Threading.Timer实现
+    /// </summary>
+    class Method04
+    {
+        public event Trans Info;
+        public event Work StartCode; //启动执行代码
+        public event Work WorkCode; //启动执行代码
+        public event Work PauseCode; //暂停执行代码
+        public event Work ResumeCode; //恢复执行代码
+        public event Work StopCode; //停止执行代码
+        public event Work EndCode; //结束执行代码
+        System.Threading.Timer timer;
+        int count;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public Method04()
+        {
+
+        }
+        /// <summary>
+        /// 启动运行
+        /// </summary>
+        public void ThreadStart()
+        {
+            timer = new Timer(Runtime,null,Timeout.Infinite,Timeout.Infinite);
+            timer.Change(0, 500);
+            count = 0;
+            Info?.Invoke("启动运行！！！");
+            StartCode?.Invoke();
+        }
+        /// <summary>
+        /// 暂停运行
+        /// </summary>
+        public void ThreadPause()
+        {
+            timer.Change(Timeout.Infinite, Timeout.Infinite);
+            Info?.Invoke("暂停运行！！！");
+            PauseCode?.Invoke();
+        }
+        /// <summary>
+        /// 恢复运行
+        /// </summary>
+        public void ThreadResume()
+        {
+            timer.Change(0, 500);
+            Info?.Invoke("继续运行！！！");
+            ResumeCode?.Invoke();
+        }
+        /// <summary>
+        /// 终止运行
+        /// </summary>
+        public void ThreadStop()
+        {
+            timer.Dispose();
+            Info?.Invoke("终止运行！！！");
+        }
+        /// <summary>
+        /// 循环结构
+        /// </summary>
+        public void Runtime(object sender)
+        {
+            count++;
+            Info?.Invoke("计数：" + count.ToString());
+            WorkCode?.Invoke();
+            if (count == 1000) EndCode?.Invoke();
         }
     }
 }
